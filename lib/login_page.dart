@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'register_page.dart';
 
@@ -15,10 +16,35 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  // Email Login
   Future login() async {
+
     await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: emailController.text.trim(),
       password: passwordController.text.trim(),
+    );
+  }
+
+  // Google Sign In
+  Future signInWithGoogle() async {
+
+    final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+
+    await googleSignIn.initialize();
+
+    final GoogleSignInAccount gUser =
+    await googleSignIn.authenticate();
+
+    final GoogleSignInAuthentication gAuth =
+        gUser.authentication;
+
+    final OAuthCredential credential =
+    GoogleAuthProvider.credential(
+      idToken: gAuth.idToken,
+    );
+
+    await FirebaseAuth.instance.signInWithCredential(
+      credential,
     );
   }
 
@@ -61,6 +87,13 @@ class _LoginPageState extends State<LoginPage> {
             ElevatedButton(
               onPressed: login,
               child: const Text("Login"),
+            ),
+
+            const SizedBox(height: 15),
+
+            ElevatedButton(
+              onPressed: signInWithGoogle,
+              child: const Text("Sign In with Google"),
             ),
 
             const SizedBox(height: 20),
