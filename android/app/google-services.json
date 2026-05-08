@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1095312732170",
+    "project_id": "fir-authapp-ca0ac",
+    "storage_bucket": "fir-authapp-ca0ac.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1095312732170:android:704184ac642637dbee2ff3",
+        "android_client_info": {
+          "package_name": "com.neel.firebase_auth_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD70CvaY3JcmYTOhfZyXLeRuvui4RTVGHQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
