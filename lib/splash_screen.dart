@@ -159,7 +159,7 @@ class _SplashScreenState extends State<SplashScreen>
                 );
               },
               child: Image.asset(
-                'assets/images/SIcon.png',
+                'assets/images/RSIcon.png',
                 height: 230,
               ),
             ),
