@@ -5,7 +5,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+
+  final bool isDarkMode;
+
+  const LoginPage({
+    super.key,
+    this.isDarkMode = false,
+  });
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -18,7 +24,14 @@ class _LoginPageState extends State<LoginPage> {
 
   bool obscurePassword = true;
 
-  bool isDarkMode = false;
+  late bool isDarkMode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    isDarkMode = widget.isDarkMode;
+  }
 
   // =========================
   // EMAIL LOGIN
@@ -30,25 +43,18 @@ class _LoginPageState extends State<LoginPage> {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(
         email: emailController.text.trim(),
-        password:
-        passwordController.text.trim(),
+        password: passwordController.text.trim(),
       );
 
-      // =========================
-      // SUCCESS POPUP
-      // =========================
       showDialog(
         context: context,
-
         barrierDismissible: false,
 
         builder: (context) {
 
           return AlertDialog(
 
-            title: const Text(
-              "Success",
-            ),
+            title: const Text("Success"),
 
             content: const Text(
               "Login Successful.",
@@ -61,20 +67,6 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
 
                   Navigator.pop(context);
-
-                  // =========================
-                  // REDIRECT HERE
-                  // =========================
-
-                  // Example:
-                  // Navigator.pushReplacement(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) =>
-                  //     const HomePage(),
-                  //   ),
-                  // );
-
                 },
 
                 child: const Text("OK"),
@@ -108,9 +100,6 @@ class _LoginPageState extends State<LoginPage> {
         "Invalid email address.";
       }
 
-      // =========================
-      // ERROR POPUP
-      // =========================
       showDialog(
         context: context,
 
@@ -163,7 +152,8 @@ class _LoginPageState extends State<LoginPage> {
       idToken: gAuth.idToken,
     );
 
-    await FirebaseAuth.instance.signInWithCredential(
+    await FirebaseAuth.instance
+        .signInWithCredential(
       credential,
     );
   }
@@ -223,7 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
 
                     // =========================
-                    // TOP RIGHT THEME BUTTON
+                    // THEME BUTTON
                     // =========================
                     Align(
                       alignment: Alignment.topRight,
@@ -234,7 +224,8 @@ class _LoginPageState extends State<LoginPage> {
 
                           setState(() {
 
-                            isDarkMode = !isDarkMode;
+                            isDarkMode =
+                            !isDarkMode;
                           });
                         },
 
@@ -254,9 +245,12 @@ class _LoginPageState extends State<LoginPage> {
                     // MAIN CARD
                     // =========================
                     Container(
-                      margin: const EdgeInsets.only(top: 5),
+                      margin: const EdgeInsets.only(
+                        top: 5,
+                      ),
 
-                      padding: const EdgeInsets.symmetric(
+                      padding:
+                      const EdgeInsets.symmetric(
                         horizontal: 25,
                         vertical: 35,
                       ),
@@ -294,10 +288,14 @@ class _LoginPageState extends State<LoginPage> {
 
                             style: TextStyle(
                               fontSize: 32,
-                              fontWeight: FontWeight.bold,
+                              fontWeight:
+                              FontWeight.bold,
+
                               color: isDarkMode
                                   ? Colors.white
-                                  : const Color(0xFF183869),
+                                  : const Color(
+                                0xFF183869,
+                              ),
                             ),
                           ),
 
@@ -321,26 +319,34 @@ class _LoginPageState extends State<LoginPage> {
                               labelText: "Email",
 
                               labelStyle: TextStyle(
-                                color: secondaryTextColor,
+                                color:
+                                secondaryTextColor,
                               ),
 
                               floatingLabelStyle:
                               const TextStyle(
-                                color: Color(0xFF183869),
-                                fontWeight: FontWeight.bold,
+                                color:
+                                Color(0xFF183869),
+
+                                fontWeight:
+                                FontWeight.bold,
                               ),
 
                               enabledBorder:
                               UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: fieldBorderColor,
+                                borderSide:
+                                BorderSide(
+                                  color:
+                                  fieldBorderColor,
                                 ),
                               ),
 
                               focusedBorder:
                               const UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Color(0xFF183869),
+                                borderSide:
+                                BorderSide(
+                                  color:
+                                  Color(0xFF183869),
                                   width: 2,
                                 ),
                               ),
@@ -353,7 +359,8 @@ class _LoginPageState extends State<LoginPage> {
                           // PASSWORD FIELD
                           // =========================
                           TextField(
-                            controller: passwordController,
+                            controller:
+                            passwordController,
 
                             obscureText:
                             obscurePassword,
@@ -370,16 +377,21 @@ class _LoginPageState extends State<LoginPage> {
                               labelText: "Password",
 
                               labelStyle: TextStyle(
-                                color: secondaryTextColor,
+                                color:
+                                secondaryTextColor,
                               ),
 
                               floatingLabelStyle:
                               const TextStyle(
-                                color: Color(0xFF183869),
-                                fontWeight: FontWeight.bold,
+                                color:
+                                Color(0xFF183869),
+
+                                fontWeight:
+                                FontWeight.bold,
                               ),
 
-                              suffixIcon: IconButton(
+                              suffixIcon:
+                              IconButton(
 
                                 onPressed: () {
 
@@ -393,24 +405,31 @@ class _LoginPageState extends State<LoginPage> {
                                 icon: Icon(
 
                                   obscurePassword
-                                      ? Icons.visibility_off
-                                      : Icons.visibility,
+                                      ? Icons
+                                      .visibility_off
+                                      : Icons
+                                      .visibility,
 
-                                  color: secondaryTextColor,
+                                  color:
+                                  secondaryTextColor,
                                 ),
                               ),
 
                               enabledBorder:
                               UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: fieldBorderColor,
+                                borderSide:
+                                BorderSide(
+                                  color:
+                                  fieldBorderColor,
                                 ),
                               ),
 
                               focusedBorder:
                               const UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Color(0xFF183869),
+                                borderSide:
+                                BorderSide(
+                                  color:
+                                  Color(0xFF183869),
                                   width: 2,
                                 ),
                               ),
@@ -432,7 +451,9 @@ class _LoginPageState extends State<LoginPage> {
                               style:
                               ElevatedButton.styleFrom(
                                 backgroundColor:
-                                const Color(0xFF183869),
+                                const Color(
+                                  0xFF183869,
+                                ),
 
                                 shape:
                                 RoundedRectangleBorder(
@@ -461,16 +482,18 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 15),
 
                           // =========================
-                          // TERMS TEXT
+                          // TERMS
                           // =========================
                           Center(
                             child: Text(
                               "By Signing In, you agree to\nour Terms & Privacy Policy",
 
-                              textAlign: TextAlign.center,
+                              textAlign:
+                              TextAlign.center,
 
                               style: TextStyle(
-                                color: secondaryTextColor,
+                                color:
+                                secondaryTextColor,
                                 fontSize: 13,
                               ),
                             ),
@@ -479,14 +502,15 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 10),
 
                           // =========================
-                          // OR TEXT
+                          // OR
                           // =========================
                           Center(
                             child: Text(
                               "or",
 
                               style: TextStyle(
-                                color: secondaryTextColor,
+                                color:
+                                secondaryTextColor,
                                 fontSize: 16,
                               ),
                             ),
@@ -499,31 +523,43 @@ class _LoginPageState extends State<LoginPage> {
                           // =========================
                           Center(
                             child: GestureDetector(
-                              onTap: signInWithGoogle,
+                              onTap:
+                              signInWithGoogle,
 
                               child: Container(
                                 height: 65,
                                 width: 65,
 
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
+                                decoration:
+                                BoxDecoration(
+                                  color:
+                                  Colors.white,
+
+                                  shape:
+                                  BoxShape.circle,
 
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withValues(
+                                      color: Colors
+                                          .black
+                                          .withValues(
                                         alpha: 0.12,
                                       ),
 
                                       blurRadius: 10,
+
                                       offset:
-                                      const Offset(0, 5),
+                                      const Offset(
+                                        0,
+                                        5,
+                                      ),
                                     ),
                                   ],
                                 ),
 
                                 child: Center(
-                                  child: Image.asset(
+                                  child:
+                                  Image.asset(
                                     'assets/images/google.png',
                                     height: 32,
                                   ),
@@ -535,7 +571,7 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 45),
 
                           // =========================
-                          // REGISTER TEXT
+                          // REGISTER LINK
                           // =========================
                           Row(
                             mainAxisAlignment:
@@ -560,7 +596,10 @@ class _LoginPageState extends State<LoginPage> {
 
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                      const RegisterPage(),
+                                          RegisterPage(
+                                            isDarkMode:
+                                            isDarkMode,
+                                          ),
                                     ),
                                   );
                                 },
@@ -572,17 +611,25 @@ class _LoginPageState extends State<LoginPage> {
 
                                     color: isDarkMode
                                         ? Colors.white70
-                                        : const Color(0xFF183869),
+                                        : const Color(
+                                      0xFF183869,
+                                    ),
 
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight:
+                                    FontWeight.bold,
 
                                     fontSize: 15,
 
-                                    decoration: TextDecoration.underline,
+                                    decoration:
+                                    TextDecoration
+                                        .underline,
 
-                                    decorationColor: isDarkMode
+                                    decorationColor:
+                                    isDarkMode
                                         ? Colors.white70
-                                        : const Color(0xFF183869),
+                                        : const Color(
+                                      0xFF183869,
+                                    ),
                                   ),
                                 ),
                               ),

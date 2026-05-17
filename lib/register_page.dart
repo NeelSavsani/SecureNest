@@ -5,7 +5,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+
+  final bool isDarkMode;
+
+  const RegisterPage({
+    super.key,
+    this.isDarkMode = false,
+  });
 
   @override
   State<RegisterPage> createState() =>
@@ -30,7 +36,14 @@ class _RegisterPageState
   bool obscurePassword = true;
   bool obscureConfirmPassword = true;
 
-  bool isDarkMode = false;
+  late bool isDarkMode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    isDarkMode = widget.isDarkMode;
+  }
 
   // =========================
   // REGISTER USER
@@ -123,7 +136,10 @@ class _RegisterPageState
 
                     MaterialPageRoute(
                       builder: (context) =>
-                      const LoginPage(),
+                          LoginPage(
+                            isDarkMode:
+                            isDarkMode,
+                          ),
                     ),
                   );
                 },
@@ -255,14 +271,18 @@ class _RegisterPageState
       body: Stack(
         children: [
 
+          // =========================
           // TOP BLUE BACKGROUND
+          // =========================
           Container(
             height: 300,
             width: double.infinity,
             color: const Color(0xFF183869),
           ),
 
+          // =========================
           // MAIN CONTENT
+          // =========================
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -272,7 +292,9 @@ class _RegisterPageState
                 child: Column(
                   children: [
 
+                    // =========================
                     // THEME BUTTON
+                    // =========================
                     Align(
                       alignment:
                       Alignment.topRight,
@@ -302,7 +324,9 @@ class _RegisterPageState
                       ),
                     ),
 
+                    // =========================
                     // MAIN CARD
+                    // =========================
                     Container(
                       margin:
                       const EdgeInsets.only(
@@ -331,7 +355,9 @@ class _RegisterPageState
 
                         children: [
 
+                          // =========================
                           // LOGO
+                          // =========================
                           Center(
                             child: Image.asset(
                               'assets/images/RSIcon.png',
@@ -343,7 +369,9 @@ class _RegisterPageState
                             height: 35,
                           ),
 
+                          // =========================
                           // TITLE
+                          // =========================
                           Text(
                             "Register",
 
@@ -364,7 +392,9 @@ class _RegisterPageState
                             height: 40,
                           ),
 
-                          // NAME
+                          // =========================
+                          // NAME FIELD
+                          // =========================
                           buildTextField(
                             controller:
                             nameController,
@@ -381,7 +411,9 @@ class _RegisterPageState
                             height: 30,
                           ),
 
-                          // EMAIL
+                          // =========================
+                          // EMAIL FIELD
+                          // =========================
                           buildTextField(
                             controller:
                             emailController,
@@ -398,7 +430,9 @@ class _RegisterPageState
                             height: 30,
                           ),
 
-                          // PASSWORD
+                          // =========================
+                          // PASSWORD FIELD
+                          // =========================
                           buildPasswordField(
                             controller:
                             passwordController,
@@ -426,7 +460,9 @@ class _RegisterPageState
                             height: 30,
                           ),
 
-                          // CONFIRM PASSWORD
+                          // =========================
+                          // CONFIRM PASSWORD FIELD
+                          // =========================
                           buildPasswordField(
                             controller:
                             confirmPasswordController,
@@ -454,7 +490,9 @@ class _RegisterPageState
                             height: 40,
                           ),
 
+                          // =========================
                           // REGISTER BUTTON
+                          // =========================
                           SizedBox(
                             width:
                             double.infinity,
@@ -505,6 +543,9 @@ class _RegisterPageState
                             height: 20,
                           ),
 
+                          // =========================
+                          // OR TEXT
+                          // =========================
                           Center(
                             child: Text(
                               "or",
@@ -520,7 +561,9 @@ class _RegisterPageState
                             height: 20,
                           ),
 
+                          // =========================
                           // GOOGLE BUTTON
+                          // =========================
                           Center(
                             child:
                             GestureDetector(
@@ -576,7 +619,9 @@ class _RegisterPageState
                             height: 45,
                           ),
 
+                          // =========================
                           // LOGIN LINK
+                          // =========================
                           Row(
                             mainAxisAlignment:
                             MainAxisAlignment
@@ -608,7 +653,10 @@ class _RegisterPageState
                                           (
                                           context,
                                           ) =>
-                                      const LoginPage(),
+                                          LoginPage(
+                                            isDarkMode:
+                                            isDarkMode,
+                                          ),
                                     ),
                                   );
                                 },
