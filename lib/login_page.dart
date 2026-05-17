@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'register_page.dart';
+import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
 
@@ -46,6 +47,9 @@ class _LoginPageState extends State<LoginPage> {
         password: passwordController.text.trim(),
       );
 
+      // =========================
+      // SUCCESS POPUP
+      // =========================
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -67,6 +71,18 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
 
                   Navigator.pop(context);
+
+                  // =========================
+                  // GO TO HOME PAGE
+                  // =========================
+                  Navigator.pushReplacement(
+                    context,
+
+                    MaterialPageRoute(
+                      builder: (context) =>
+                      const HomePage(),
+                    ),
+                  );
                 },
 
                 child: const Text("OK"),
@@ -136,26 +152,74 @@ class _LoginPageState extends State<LoginPage> {
   // =========================
   Future signInWithGoogle() async {
 
-    final GoogleSignIn googleSignIn =
-        GoogleSignIn.instance;
+    try {
 
-    await googleSignIn.initialize();
+      final GoogleSignIn googleSignIn =
+          GoogleSignIn.instance;
 
-    final GoogleSignInAccount gUser =
-    await googleSignIn.authenticate();
+      await googleSignIn.initialize();
 
-    final GoogleSignInAuthentication gAuth =
-        gUser.authentication;
+      final GoogleSignInAccount gUser =
+      await googleSignIn.authenticate();
 
-    final OAuthCredential credential =
-    GoogleAuthProvider.credential(
-      idToken: gAuth.idToken,
-    );
+      final GoogleSignInAuthentication gAuth =
+          gUser.authentication;
 
-    await FirebaseAuth.instance
-        .signInWithCredential(
-      credential,
-    );
+      final OAuthCredential credential =
+      GoogleAuthProvider.credential(
+        idToken: gAuth.idToken,
+      );
+
+      await FirebaseAuth.instance
+          .signInWithCredential(
+        credential,
+      );
+
+      // =========================
+      // GO TO HOME PAGE
+      // =========================
+      Navigator.pushReplacement(
+        context,
+
+        MaterialPageRoute(
+          builder: (context) =>
+          const HomePage(),
+        ),
+      );
+
+    } catch (e) {
+
+      showDialog(
+        context: context,
+
+        builder: (context) {
+
+          return AlertDialog(
+
+            title: const Text(
+              "Google Sign In Failed",
+            ),
+
+            content: Text(
+              e.toString(),
+            ),
+
+            actions: [
+
+              TextButton(
+
+                onPressed: () {
+
+                  Navigator.pop(context);
+                },
+
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -192,18 +256,12 @@ class _LoginPageState extends State<LoginPage> {
       body: Stack(
         children: [
 
-          // =========================
-          // TOP BLUE BACKGROUND
-          // =========================
           Container(
             height: 300,
             width: double.infinity,
             color: const Color(0xFF183869),
           ),
 
-          // =========================
-          // MAIN CONTENT
-          // =========================
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -212,9 +270,6 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   children: [
 
-                    // =========================
-                    // THEME BUTTON
-                    // =========================
                     Align(
                       alignment: Alignment.topRight,
 
@@ -241,9 +296,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
 
-                    // =========================
-                    // MAIN CARD
-                    // =========================
                     Container(
                       margin: const EdgeInsets.only(
                         top: 5,
@@ -268,9 +320,6 @@ class _LoginPageState extends State<LoginPage> {
 
                         children: [
 
-                          // =========================
-                          // LOGO
-                          // =========================
                           Center(
                             child: Image.asset(
                               'assets/images/RSIcon.png',
@@ -280,9 +329,6 @@ class _LoginPageState extends State<LoginPage> {
 
                           const SizedBox(height: 35),
 
-                          // =========================
-                          // TITLE
-                          // =========================
                           Text(
                             "Login",
 
@@ -301,9 +347,6 @@ class _LoginPageState extends State<LoginPage> {
 
                           const SizedBox(height: 40),
 
-                          // =========================
-                          // EMAIL FIELD
-                          // =========================
                           TextField(
                             controller: emailController,
 
@@ -355,9 +398,6 @@ class _LoginPageState extends State<LoginPage> {
 
                           const SizedBox(height: 30),
 
-                          // =========================
-                          // PASSWORD FIELD
-                          // =========================
                           TextField(
                             controller:
                             passwordController,
@@ -438,9 +478,6 @@ class _LoginPageState extends State<LoginPage> {
 
                           const SizedBox(height: 40),
 
-                          // =========================
-                          // LOGIN BUTTON
-                          // =========================
                           SizedBox(
                             width: double.infinity,
                             height: 55,
@@ -481,9 +518,6 @@ class _LoginPageState extends State<LoginPage> {
 
                           const SizedBox(height: 15),
 
-                          // =========================
-                          // TERMS
-                          // =========================
                           Center(
                             child: Text(
                               "By Signing In, you agree to\nour Terms & Privacy Policy",
@@ -501,9 +535,6 @@ class _LoginPageState extends State<LoginPage> {
 
                           const SizedBox(height: 10),
 
-                          // =========================
-                          // OR
-                          // =========================
                           Center(
                             child: Text(
                               "or",
@@ -518,9 +549,6 @@ class _LoginPageState extends State<LoginPage> {
 
                           const SizedBox(height: 15),
 
-                          // =========================
-                          // GOOGLE BUTTON
-                          // =========================
                           Center(
                             child: GestureDetector(
                               onTap:
@@ -570,9 +598,6 @@ class _LoginPageState extends State<LoginPage> {
 
                           const SizedBox(height: 45),
 
-                          // =========================
-                          // REGISTER LINK
-                          // =========================
                           Row(
                             mainAxisAlignment:
                             MainAxisAlignment.center,
