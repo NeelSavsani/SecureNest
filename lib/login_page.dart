@@ -25,10 +25,121 @@ class _LoginPageState extends State<LoginPage> {
   // =========================
   Future login() async {
 
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+    try {
+
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password:
+        passwordController.text.trim(),
+      );
+
+      // =========================
+      // SUCCESS POPUP
+      // =========================
+      showDialog(
+        context: context,
+
+        barrierDismissible: false,
+
+        builder: (context) {
+
+          return AlertDialog(
+
+            title: const Text(
+              "Success",
+            ),
+
+            content: const Text(
+              "Login Successful.",
+            ),
+
+            actions: [
+
+              TextButton(
+
+                onPressed: () {
+
+                  Navigator.pop(context);
+
+                  // =========================
+                  // REDIRECT HERE
+                  // =========================
+
+                  // Example:
+                  // Navigator.pushReplacement(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) =>
+                  //     const HomePage(),
+                  //   ),
+                  // );
+
+                },
+
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    on FirebaseAuthException catch (e) {
+
+      String message =
+          "Something went wrong.";
+
+      if (e.code == 'user-not-found') {
+
+        message =
+        "No user found with this email.";
+      }
+
+      else if (e.code == 'wrong-password') {
+
+        message =
+        "Incorrect password.";
+      }
+
+      else if (e.code == 'invalid-email') {
+
+        message =
+        "Invalid email address.";
+      }
+
+      // =========================
+      // ERROR POPUP
+      // =========================
+      showDialog(
+        context: context,
+
+        builder: (context) {
+
+          return AlertDialog(
+
+            title: const Text(
+              "Login Failed",
+            ),
+
+            content: Text(message),
+
+            actions: [
+
+              TextButton(
+
+                onPressed: () {
+
+                  Navigator.pop(context);
+                },
+
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   // =========================
@@ -347,14 +458,14 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
 
-                          const SizedBox(height: 25),
+                          const SizedBox(height: 15),
 
                           // =========================
                           // TERMS TEXT
                           // =========================
                           Center(
                             child: Text(
-                              "By Signing In, you agree to our\nTerms & Privacy Policy",
+                              "By Signing In, you agree to\nour Terms & Privacy Policy",
 
                               textAlign: TextAlign.center,
 
@@ -365,7 +476,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
 
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 10),
 
                           // =========================
                           // OR TEXT
@@ -381,7 +492,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
 
-                          const SizedBox(height: 25),
+                          const SizedBox(height: 15),
 
                           // =========================
                           // GOOGLE BUTTON
