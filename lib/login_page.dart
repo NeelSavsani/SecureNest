@@ -2,6 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'services/biometric_service.dart';
+import 'services/biometric_preferences.dart';
+
 import 'register_page.dart';
 import 'home_page.dart';
 
@@ -15,13 +18,18 @@ class LoginPage extends StatefulWidget {
   });
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginPage> createState() =>
+      _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState
+    extends State<LoginPage> {
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final emailController =
+  TextEditingController();
+
+  final passwordController =
+  TextEditingController();
 
   bool obscurePassword = true;
 
@@ -44,53 +52,176 @@ class _LoginPageState extends State<LoginPage> {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(
         email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+        password:
+        passwordController.text.trim(),
       );
 
       // =========================
-      // SUCCESS POPUP
+      // CHECK BIOMETRIC SUPPORT
       // =========================
-      showDialog(
-        context: context,
-        barrierDismissible: false,
+      bool biometricAvailable =
+      await BiometricService
+          .isBiometricAvailable();
 
-        builder: (context) {
+      // =========================
+      // SHOW ENABLE POPUP
+      // =========================
+      if (biometricAvailable) {
 
-          return AlertDialog(
+        showDialog(
+          context: context,
 
-            title: const Text("Success"),
+          barrierDismissible: false,
 
-            content: const Text(
-              "Login Successful.",
-            ),
+          builder: (context) {
 
-            actions: [
+            return AlertDialog(
 
-              TextButton(
-
-                onPressed: () {
-
-                  Navigator.pop(context);
-
-                  // =========================
-                  // GO TO HOME PAGE
-                  // =========================
-                  Navigator.pushReplacement(
-                    context,
-
-                    MaterialPageRoute(
-                      builder: (context) =>
-                      const HomePage(),
-                    ),
-                  );
-                },
-
-                child: const Text("OK"),
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                BorderRadius.circular(
+                  20,
+                ),
               ),
-            ],
-          );
-        },
-      );
+
+              title: const Text(
+                "Enable Biometrics",
+              ),
+
+              content: const Text(
+                "Would you like to enable biometric login for faster and secure access?",
+              ),
+
+              actions: [
+
+                // =========================
+                // SKIP BUTTON
+                // =========================
+                TextButton(
+
+                  onPressed: () {
+
+                    Navigator.pop(context);
+
+                    Navigator.pushReplacement(
+                      context,
+
+                      MaterialPageRoute(
+                        builder: (context) =>
+                        const HomePage(),
+                      ),
+                    );
+                  },
+
+                  child: const Text(
+                    "Skip",
+                  ),
+                ),
+
+                // =========================
+                // ENABLE BUTTON
+                // =========================
+                ElevatedButton(
+
+                  style:
+                  ElevatedButton.styleFrom(
+                    backgroundColor:
+                    const Color(
+                      0xFF183869,
+                    ),
+
+                    foregroundColor:
+                    Colors.white,
+                  ),
+
+                  onPressed: () async {
+
+                    // CLOSE POPUP
+                    Navigator.pop(context);
+
+                    // AUTHENTICATE
+                    bool authenticated =
+                    await BiometricService
+                        .authenticate();
+
+                    if (authenticated) {
+
+                      // SAVE PREFERENCE
+                      await BiometricPreferences
+                          .setBiometricEnabled(
+                        true,
+                      );
+
+                      if (mounted) {
+
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(
+
+                          const SnackBar(
+                            content: Text(
+                              "Biometric Enabled",
+                            ),
+                          ),
+                        );
+                      }
+                    }
+
+                    else {
+
+                      if (mounted) {
+
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(
+
+                          const SnackBar(
+                            content: Text(
+                              "Biometric Authentication Failed",
+                            ),
+                          ),
+                        );
+                      }
+                    }
+
+                    // GO TO HOME
+                    if (mounted) {
+
+                      Navigator.pushReplacement(
+                        context,
+
+                        MaterialPageRoute(
+                          builder: (context) =>
+                          const HomePage(),
+                        ),
+                      );
+                    }
+                  },
+
+                  child: const Text(
+                    "Enable",
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      }
+
+      // =========================
+      // NO BIOMETRIC SUPPORT
+      // =========================
+      else {
+
+        Navigator.pushReplacement(
+          context,
+
+          MaterialPageRoute(
+            builder: (context) =>
+            const HomePage(),
+          ),
+        );
+      }
     }
 
     on FirebaseAuthException catch (e) {
@@ -104,13 +235,15 @@ class _LoginPageState extends State<LoginPage> {
         "No user found with this email.";
       }
 
-      else if (e.code == 'wrong-password') {
+      else if (e.code ==
+          'wrong-password') {
 
         message =
         "Incorrect password.";
       }
 
-      else if (e.code == 'invalid-email') {
+      else if (e.code ==
+          'invalid-email') {
 
         message =
         "Invalid email address.";
@@ -138,7 +271,9 @@ class _LoginPageState extends State<LoginPage> {
                   Navigator.pop(context);
                 },
 
-                child: const Text("OK"),
+                child: const Text(
+                  "OK",
+                ),
               ),
             ],
           );
@@ -162,7 +297,8 @@ class _LoginPageState extends State<LoginPage> {
       final GoogleSignInAccount gUser =
       await googleSignIn.authenticate();
 
-      final GoogleSignInAuthentication gAuth =
+      final GoogleSignInAuthentication
+      gAuth =
           gUser.authentication;
 
       final OAuthCredential credential =
@@ -175,17 +311,17 @@ class _LoginPageState extends State<LoginPage> {
         credential,
       );
 
-      // =========================
-      // GO TO HOME PAGE
-      // =========================
-      Navigator.pushReplacement(
-        context,
+      if (mounted) {
 
-        MaterialPageRoute(
-          builder: (context) =>
-          const HomePage(),
-        ),
-      );
+        Navigator.pushReplacement(
+          context,
+
+          MaterialPageRoute(
+            builder: (context) =>
+            const HomePage(),
+          ),
+        );
+      }
 
     } catch (e) {
 
@@ -213,7 +349,9 @@ class _LoginPageState extends State<LoginPage> {
                   Navigator.pop(context);
                 },
 
-                child: const Text("OK"),
+                child: const Text(
+                  "OK",
+                ),
               ),
             ],
           );
@@ -251,27 +389,41 @@ class _LoginPageState extends State<LoginPage> {
         : Colors.grey;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor:
+      backgroundColor,
 
       body: Stack(
         children: [
 
+          // =========================
+          // TOP BLUE BACKGROUND
+          // =========================
           Container(
             height: 300,
             width: double.infinity,
-            color: const Color(0xFF183869),
+            color: const Color(
+              0xFF183869,
+            ),
           ),
 
+          // =========================
+          // MAIN CONTENT
+          // =========================
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding:
+                const EdgeInsets.all(20),
 
                 child: Column(
                   children: [
 
+                    // =========================
+                    // THEME BUTTON
+                    // =========================
                     Align(
-                      alignment: Alignment.topRight,
+                      alignment:
+                      Alignment.topRight,
 
                       child: IconButton(
 
@@ -287,17 +439,25 @@ class _LoginPageState extends State<LoginPage> {
                         icon: Icon(
 
                           isDarkMode
-                              ? Icons.wb_sunny_rounded
-                              : Icons.dark_mode_rounded,
+                              ? Icons
+                              .wb_sunny_rounded
+                              : Icons
+                              .dark_mode_rounded,
 
-                          color: Colors.white,
+                          color:
+                          Colors.white,
+
                           size: 30,
                         ),
                       ),
                     ),
 
+                    // =========================
+                    // LOGIN CARD
+                    // =========================
                     Container(
-                      margin: const EdgeInsets.only(
+                      margin:
+                      const EdgeInsets.only(
                         top: 5,
                       ),
 
@@ -307,19 +467,26 @@ class _LoginPageState extends State<LoginPage> {
                         vertical: 35,
                       ),
 
-                      decoration: BoxDecoration(
+                      decoration:
+                      BoxDecoration(
                         color: cardColor,
 
                         borderRadius:
-                        BorderRadius.circular(40),
+                        BorderRadius.circular(
+                          40,
+                        ),
                       ),
 
                       child: Column(
                         crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                        CrossAxisAlignment
+                            .start,
 
                         children: [
 
+                          // =========================
+                          // LOGO
+                          // =========================
                           Center(
                             child: Image.asset(
                               'assets/images/RSIcon.png',
@@ -327,8 +494,13 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
 
-                          const SizedBox(height: 35),
+                          const SizedBox(
+                            height: 35,
+                          ),
 
+                          // =========================
+                          // TITLE
+                          // =========================
                           Text(
                             "Login",
 
@@ -345,31 +517,44 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
 
-                          const SizedBox(height: 40),
+                          const SizedBox(
+                            height: 40,
+                          ),
 
+                          // =========================
+                          // EMAIL FIELD
+                          // =========================
                           TextField(
-                            controller: emailController,
+                            controller:
+                            emailController,
 
                             style: TextStyle(
-                              color: textColor,
+                              color:
+                              textColor,
                             ),
 
                             cursorColor:
-                            const Color(0xFF183869),
+                            const Color(
+                              0xFF183869,
+                            ),
 
-                            decoration: InputDecoration(
+                            decoration:
+                            InputDecoration(
 
-                              labelText: "Email",
+                              labelText:
+                              "Email",
 
-                              labelStyle: TextStyle(
+                              labelStyle:
+                              TextStyle(
                                 color:
                                 secondaryTextColor,
                               ),
 
                               floatingLabelStyle:
                               const TextStyle(
-                                color:
-                                Color(0xFF183869),
+                                color: Color(
+                                  0xFF183869,
+                                ),
 
                                 fontWeight:
                                 FontWeight.bold,
@@ -389,15 +574,22 @@ class _LoginPageState extends State<LoginPage> {
                                 borderSide:
                                 BorderSide(
                                   color:
-                                  Color(0xFF183869),
+                                  Color(
+                                    0xFF183869,
+                                  ),
                                   width: 2,
                                 ),
                               ),
                             ),
                           ),
 
-                          const SizedBox(height: 30),
+                          const SizedBox(
+                            height: 30,
+                          ),
 
+                          // =========================
+                          // PASSWORD FIELD
+                          // =========================
                           TextField(
                             controller:
                             passwordController,
@@ -406,25 +598,32 @@ class _LoginPageState extends State<LoginPage> {
                             obscurePassword,
 
                             style: TextStyle(
-                              color: textColor,
+                              color:
+                              textColor,
                             ),
 
                             cursorColor:
-                            const Color(0xFF183869),
+                            const Color(
+                              0xFF183869,
+                            ),
 
-                            decoration: InputDecoration(
+                            decoration:
+                            InputDecoration(
 
-                              labelText: "Password",
+                              labelText:
+                              "Password",
 
-                              labelStyle: TextStyle(
+                              labelStyle:
+                              TextStyle(
                                 color:
                                 secondaryTextColor,
                               ),
 
                               floatingLabelStyle:
                               const TextStyle(
-                                color:
-                                Color(0xFF183869),
+                                color: Color(
+                                  0xFF183869,
+                                ),
 
                                 fontWeight:
                                 FontWeight.bold,
@@ -469,24 +668,35 @@ class _LoginPageState extends State<LoginPage> {
                                 borderSide:
                                 BorderSide(
                                   color:
-                                  Color(0xFF183869),
+                                  Color(
+                                    0xFF183869,
+                                  ),
                                   width: 2,
                                 ),
                               ),
                             ),
                           ),
 
-                          const SizedBox(height: 40),
+                          const SizedBox(
+                            height: 40,
+                          ),
 
+                          // =========================
+                          // LOGIN BUTTON
+                          // =========================
                           SizedBox(
-                            width: double.infinity,
+                            width:
+                            double.infinity,
                             height: 55,
 
-                            child: ElevatedButton(
-                              onPressed: login,
+                            child:
+                            ElevatedButton(
+                              onPressed:
+                              login,
 
                               style:
-                              ElevatedButton.styleFrom(
+                              ElevatedButton
+                                  .styleFrom(
                                 backgroundColor:
                                 const Color(
                                   0xFF183869,
@@ -499,25 +709,34 @@ class _LoginPageState extends State<LoginPage> {
                                     15,
                                   ),
                                 ),
-
-                                elevation: 0,
                               ),
 
                               child: const Text(
                                 "Login",
 
-                                style: TextStyle(
-                                  fontSize: 18,
+                                style:
+                                TextStyle(
+                                  fontSize:
+                                  18,
+
                                   fontWeight:
-                                  FontWeight.bold,
-                                  color: Colors.white,
+                                  FontWeight
+                                      .bold,
+
+                                  color:
+                                  Colors.white,
                                 ),
                               ),
                             ),
                           ),
 
-                          const SizedBox(height: 15),
+                          const SizedBox(
+                            height: 15,
+                          ),
 
+                          // =========================
+                          // TERMS
+                          // =========================
                           Center(
                             child: Text(
                               "By Signing In, you agree to\nour Terms & Privacy Policy",
@@ -525,32 +744,47 @@ class _LoginPageState extends State<LoginPage> {
                               textAlign:
                               TextAlign.center,
 
-                              style: TextStyle(
+                              style:
+                              TextStyle(
                                 color:
                                 secondaryTextColor,
+
                                 fontSize: 13,
                               ),
                             ),
                           ),
 
-                          const SizedBox(height: 10),
+                          const SizedBox(
+                            height: 10,
+                          ),
 
+                          // =========================
+                          // OR TEXT
+                          // =========================
                           Center(
                             child: Text(
                               "or",
 
-                              style: TextStyle(
+                              style:
+                              TextStyle(
                                 color:
                                 secondaryTextColor,
+
                                 fontSize: 16,
                               ),
                             ),
                           ),
 
-                          const SizedBox(height: 15),
+                          const SizedBox(
+                            height: 15,
+                          ),
 
+                          // =========================
+                          // GOOGLE BUTTON
+                          // =========================
                           Center(
-                            child: GestureDetector(
+                            child:
+                            GestureDetector(
                               onTap:
                               signInWithGoogle,
 
@@ -568,13 +802,15 @@ class _LoginPageState extends State<LoginPage> {
 
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors
-                                          .black
+                                      color:
+                                      Colors.black
                                           .withValues(
-                                        alpha: 0.12,
+                                        alpha:
+                                        0.12,
                                       ),
 
-                                      blurRadius: 10,
+                                      blurRadius:
+                                      10,
 
                                       offset:
                                       const Offset(
@@ -589,27 +825,38 @@ class _LoginPageState extends State<LoginPage> {
                                   child:
                                   Image.asset(
                                     'assets/images/google.png',
-                                    height: 32,
+                                    height:
+                                    32,
                                   ),
                                 ),
                               ),
                             ),
                           ),
 
-                          const SizedBox(height: 45),
+                          const SizedBox(
+                            height: 45,
+                          ),
 
+                          // =========================
+                          // REGISTER LINK
+                          // =========================
                           Row(
                             mainAxisAlignment:
-                            MainAxisAlignment.center,
+                            MainAxisAlignment
+                                .center,
 
                             children: [
 
                               Text(
                                 "Don't have an account? ",
 
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: textColor,
+                                style:
+                                TextStyle(
+                                  fontSize:
+                                  15,
+
+                                  color:
+                                  textColor,
                                 ),
                               ),
 
@@ -620,7 +867,10 @@ class _LoginPageState extends State<LoginPage> {
                                     context,
 
                                     MaterialPageRoute(
-                                      builder: (context) =>
+                                      builder:
+                                          (
+                                          context,
+                                          ) =>
                                           RegisterPage(
                                             isDarkMode:
                                             isDarkMode,
@@ -632,18 +882,23 @@ class _LoginPageState extends State<LoginPage> {
                                 child: Text(
                                   "Register",
 
-                                  style: TextStyle(
+                                  style:
+                                  TextStyle(
 
-                                    color: isDarkMode
-                                        ? Colors.white70
+                                    color:
+                                    isDarkMode
+                                        ? Colors
+                                        .white70
                                         : const Color(
                                       0xFF183869,
                                     ),
 
                                     fontWeight:
-                                    FontWeight.bold,
+                                    FontWeight
+                                        .bold,
 
-                                    fontSize: 15,
+                                    fontSize:
+                                    15,
 
                                     decoration:
                                     TextDecoration
@@ -651,7 +906,8 @@ class _LoginPageState extends State<LoginPage> {
 
                                     decorationColor:
                                     isDarkMode
-                                        ? Colors.white70
+                                        ? Colors
+                                        .white70
                                         : const Color(
                                       0xFF183869,
                                     ),
