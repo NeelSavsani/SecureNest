@@ -43,8 +43,8 @@ class _LoginPageState
   }
 
   // =========================
-  // EMAIL LOGIN
-  // =========================
+// EMAIL LOGIN
+// =========================
   Future login() async {
 
     try {
@@ -64,9 +64,17 @@ class _LoginPageState
           .isBiometricAvailable();
 
       // =========================
-      // SHOW ENABLE POPUP
+      // CHECK ALREADY ENABLED
       // =========================
-      if (biometricAvailable) {
+      bool alreadyEnabled =
+      await BiometricPreferences
+          .isBiometricEnabled();
+
+      // =========================
+      // SHOW POPUP ONLY FIRST TIME
+      // =========================
+      if (biometricAvailable &&
+          !alreadyEnabled) {
 
         showDialog(
           context: context,
@@ -146,7 +154,7 @@ class _LoginPageState
 
                     if (authenticated) {
 
-                      // SAVE PREFERENCE
+                      // SAVE STATUS
                       await BiometricPreferences
                           .setBiometricEnabled(
                         true,
@@ -177,7 +185,7 @@ class _LoginPageState
 
                           const SnackBar(
                             content: Text(
-                              "Biometric Authentication Failed",
+                              "Authentication Failed",
                             ),
                           ),
                         );
@@ -209,7 +217,7 @@ class _LoginPageState
       }
 
       // =========================
-      // NO BIOMETRIC SUPPORT
+      // ALREADY ENABLED
       // =========================
       else {
 
