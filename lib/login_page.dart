@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
+import 'reset_password_page.dart';
 import 'services/biometric_service.dart';
 import 'services/biometric_preferences.dart';
 
@@ -686,8 +686,61 @@ class _LoginPageState
                           ),
 
                           const SizedBox(
-                            height: 40,
+                            height: 20,
                           ),
+
+                          // =========================
+                          // FORGOT PASSWORD
+                          // =========================
+                          Align(
+                            alignment: Alignment.center,
+
+                            child: GestureDetector(
+
+                              onTap: () {
+
+                                Navigator.push(
+                                  context,
+
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ResetPasswordPage(
+                                          isDarkMode:
+                                          isDarkMode,
+                                        ),
+                                  ),
+                                );
+                              },
+
+                              child: Text(
+                                "Forgot Password?",
+
+                                style: TextStyle(
+
+                                  color: isDarkMode
+                                      ? Colors.white70
+                                      : const Color(
+                                    0xFF183869,
+                                  ),
+
+                                  fontWeight:
+                                  FontWeight.bold,
+
+                                  decoration:
+                                  TextDecoration.underline,
+
+                                  decorationColor:
+                                  isDarkMode
+                                      ? Colors.white70
+                                      : const Color(
+                                    0xFF183869,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 15),
 
                           // =========================
                           // LOGIN BUTTON
